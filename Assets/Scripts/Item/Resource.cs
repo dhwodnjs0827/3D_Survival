@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Resource : MonoBehaviour
 {
-    public ItemData itemToGive;
-    public int quantityPerHit = 1;
-    public int capacity;
+    public ItemData itemToGive; // 드랍 할 아이템 정보(SO)
+    public int quantityPerHit = 1;  // 한 번에 드랍할 갯수
+    public int capacity;    // 드랍 가능 횟수
 
     public void Gather(Vector3 hitPoint, Vector3 hitNormal)
     {

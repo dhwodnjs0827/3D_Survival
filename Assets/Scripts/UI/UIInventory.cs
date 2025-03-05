@@ -11,9 +11,10 @@ public class UIInventory : MonoBehaviour
 
     public GameObject inventoryWindow;
     public Transform slotPanel;
-    public Transform dropPosition;
+    public Transform dropPosition;  // item 버릴 때 필요한 위치
 
-    [Header("Select Item")] public TextMeshProUGUI selectedItemName;
+    [Header("Select Item")] // 선택한 슬롯의 아이템 정보 표시 위한 UI
+    public TextMeshProUGUI selectedItemName;
     public TextMeshProUGUI selectedItemDescription;
     public TextMeshProUGUI selectedStatName;
     public TextMeshProUGUI selectedStatValue;
@@ -36,9 +37,11 @@ public class UIInventory : MonoBehaviour
         condition = CharacterManager.Instance.Player.condition;
         dropPosition = CharacterManager.Instance.Player.dropPosition;
 
-        controller.inventory += Toggle;
-        CharacterManager.Instance.Player.addItem += AddItem;
+        // Action 호출 시 필요한 함수 등록
+        controller.inventory += Toggle; // inventory 키 입력 시
+        CharacterManager.Instance.Player.addItem += AddItem;    // 아이템 파밍 시
 
+        // Inventory UI 초기화 로직들
         inventoryWindow.SetActive(false);
         slots = new ItemSlot[slotPanel.childCount];
 
@@ -52,6 +55,7 @@ public class UIInventory : MonoBehaviour
         ClearSelectedItemWindow();
     }
 
+    // 선택한 아이템 표시할 정보창 Clear 함수
     private void ClearSelectedItemWindow()
     {
         selectedItemName.text = String.Empty;
@@ -65,6 +69,7 @@ public class UIInventory : MonoBehaviour
         dropButton.SetActive(false);
     }
 
+    // Inventory 창 Open/Close 시 호출
     public void Toggle()
     {
         if (IsOpen())
@@ -84,8 +89,10 @@ public class UIInventory : MonoBehaviour
 
     private void AddItem()
     {
+        // 10강 ItemObject 로직에서 Player에 넘겨준 정보를 가지고 옴
         ItemData data = CharacterManager.Instance.Player.itemData;
 
+        // 여러개 가질 수 있는 아이템이라면
         if (data.canStack)
         {
             ItemSlot slot = GetItemStack(data);
@@ -98,8 +105,10 @@ public class UIInventory : MonoBehaviour
             }
         }
 
+        // 빈 슬롯 찾기
         ItemSlot emptySlot = GetEmptySlot();
 
+        // 빈 슬롯이 있다면
         if (emptySlot != null)
         {
             emptySlot.item = data;
@@ -109,14 +118,17 @@ public class UIInventory : MonoBehaviour
             return;
         }
 
+        // 빈 슬롯 마저 없을 때
         ThrowItem(data);
         CharacterManager.Instance.Player.itemData = null;
     }
 
+    // UI 정보 새로고침
     private void UpdateUI()
     {
         for (int i = 0; i < slots.Length; i++)
         {
+            // 슬롯에 아이템 정보가 있다면
             if (slots[i].item != null)
             {
                 slots[i].Set();
@@ -128,6 +140,7 @@ public class UIInventory : MonoBehaviour
         }
     }
 
+    // 여러개 가질 수 있는 아이템의 정보 찾아서 return
     private ItemSlot GetItemStack(ItemData data)
     {
         for (int i = 0; i < slots.Length; i++)
@@ -141,6 +154,7 @@ public class UIInventory : MonoBehaviour
         return null;
     }
 
+    // 슬롯의 item 정보가 비어있는 정보 return
     private ItemSlot GetEmptySlot()
     {
         for (int i = 0; i < slots.Length; i++)
@@ -154,11 +168,15 @@ public class UIInventory : MonoBehaviour
         return null;
     }
 
+    // Player 스크립트 먼저 수정
+    // 아이템 버리기 (실제론 매개변수로 들어온 데이터에 해당하는 아이템 생성)
     private void ThrowItem(ItemData data)
     {
         Instantiate(data.dropPrefab, dropPosition.position, Quaternion.Euler(Vector3.one * Random.value * 360));
     }
 
+    // ItemSlot 스크립트 먼저 수정
+    // 선택한 아이템 정보창에 업데이트 해주는 함수
     public void SelectItem(int index)
     {
         if (slots[index].item == null)
